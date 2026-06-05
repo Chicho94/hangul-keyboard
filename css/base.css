@@ -1,0 +1,77 @@
+/* ═══════════════════════════════════════
+   BASE.CSS — Reset · Variables · Typography
+   ═══════════════════════════════════════ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* Palette */
+  --bg:         #0d0d0f;
+  --bg-2:       #14141a;
+  --bg-3:       #1c1c26;
+  --surface:    #20202e;
+  --surface-2:  #2a2a3e;
+  --border:     #2e2e42;
+  --border-hi:  #4a4a6a;
+
+  --text-1:     #f0eeff;
+  --text-2:     #a8a4c8;
+  --text-3:     #6a6688;
+
+  --accent:     #c8b4ff;
+  --accent-dim: #7a60cc;
+  --accent-glow:#c8b4ff44;
+
+  --correct:    #7effb2;
+  --correct-bg: #7effb215;
+  --error:      #ff6b8a;
+  --error-bg:   #ff6b8a15;
+  --pending:    #3a3a52;
+
+  /* Typography */
+  --font-mono:  'Space Mono', 'Courier New', monospace;
+  --font-kr:    'Noto Sans KR', sans-serif;
+
+  /* Sizing */
+  --radius-sm:  6px;
+  --radius-md:  12px;
+  --radius-lg:  20px;
+
+  /* Transitions */
+  --ease:       cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out:   cubic-bezier(0.0, 0.0, 0.2, 1);
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text-1);
+  font-family: var(--font-kr);
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+  border: none;
+  background: none;
+}
+
+input {
+  font-family: inherit;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg-2); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }

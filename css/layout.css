@@ -1,0 +1,248 @@
+/* ═══════════════════════════════════════
+   LAYOUT.CSS — Screens · Grid · Containers
+   ═══════════════════════════════════════ */
+
+/* ── Screen system ── */
+.screen {
+  position: fixed;
+  inset: 0;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s var(--ease);
+}
+
+.screen.active {
+  display: flex;
+  opacity: 1;
+}
+
+.screen.exiting {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ── MENU screen ── */
+#screen-menu {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  overflow: hidden;
+}
+
+.menu-bg-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 48px 48px;
+  opacity: 0.35;
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, black 40%, transparent 100%);
+}
+
+.menu-center {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  max-width: 700px;
+  width: 100%;
+  padding: 24px;
+}
+
+/* ── EXERCISE screen ── */
+#screen-exercise {
+  flex-direction: column;
+  background: var(--bg);
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-2);
+  flex-shrink: 0;
+}
+
+.header-mode-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-glow);
+  border: 1px solid var(--accent-dim);
+  padding: 4px 12px;
+  border-radius: 999px;
+}
+
+.header-stats {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+}
+
+.progress-track {
+  height: 3px;
+  background: var(--surface);
+  position: relative;
+  flex-shrink: 0;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.4s var(--ease);
+  width: 0%;
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+
+.progress-label {
+  position: absolute;
+  right: 12px;
+  top: 6px;
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--text-3);
+}
+
+/* ── Exercise main + aside ── */
+.exercise-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 24px;
+  gap: 28px;
+  overflow-y: auto;
+}
+
+.metrics-panel {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 12px 24px;
+  border-top: 1px solid var(--border);
+  background: var(--bg-2);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+/* ── RESULTS screen ── */
+#screen-results {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+}
+
+.results-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  max-width: 520px;
+  width: 100%;
+  padding: 24px;
+}
+
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  width: 100%;
+}
+
+.results-actions {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.results-actions > * {
+  flex: 1;
+}
+
+/* ═══════════════════════════════════════
+   FREE WRITE SCREEN — minimal
+   ═══════════════════════════════════════ */
+
+#screen-freewrite {
+  flex-direction: column;
+  background: var(--bg);
+}
+
+/* ── Minimal header ── */
+.fw-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-2);
+  flex-shrink: 0;
+}
+
+.fw-kb-toggle {
+  margin-left: auto;
+}
+
+/* ── Textarea fills all available space ── */
+.fw-textarea {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  background: var(--bg);
+  border: none;
+  border-radius: 0;
+  padding: 24px 32px;
+  font-family: var(--font-kr);
+  font-size: 22px;
+  line-height: 1.9;
+  color: var(--text-1);
+  outline: none;
+  resize: none;
+  caret-color: var(--accent);
+}
+
+.fw-textarea::placeholder {
+  color: var(--text-3);
+  font-size: 16px;
+}
+
+/* ── Target bar (sits above keyboard) ── */
+.fw-target-bar {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 16px;
+  border-top: 1px solid var(--border);
+  background: var(--bg-2);
+  min-height: 44px;
+}
+
+.fw-target-toggle-btn {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-3);
+  padding: 4px 0;
+  text-align: left;
+  transition: color 0.2s;
+}
+
+.fw-target-toggle-btn:hover {
+  color: var(--accent);
+}
+
+.fw-target-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

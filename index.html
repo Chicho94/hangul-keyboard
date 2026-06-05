@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>한글 연습 — Hangul Practice</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/components.css" />
+</head>
+<body>
+
+  <!-- ── SCREEN: MENU ── -->
+  <div id="screen-menu" class="screen active">
+    <div class="menu-bg-grid"></div>
+    <div class="menu-center">
+      <div class="logo-block">
+        <span class="logo-hangul">한글</span>
+        <span class="logo-sub">PRACTICE</span>
+      </div>
+      <p class="menu-desc">Master Korean writing through focused, progressive exercises.</p>
+      <div class="mode-cards">
+        <button class="mode-card" data-mode="letters">
+          <span class="mode-icon">ㄱ</span>
+          <span class="mode-title">Letters</span>
+          <span class="mode-hint">Hangul + QWERTY key</span>
+        </button>
+        <button class="mode-card" data-mode="words">
+          <span class="mode-icon">가나</span>
+          <span class="mode-title">Words</span>
+          <span class="mode-hint">Write full words</span>
+        </button>
+        <button class="mode-card" data-mode="sentences">
+          <span class="mode-icon">문장</span>
+          <span class="mode-title">Sentences</span>
+          <span class="mode-hint">Write full sentences</span>
+        </button>
+        <a href="freewrite.html" class="mode-card mode-card--free">
+          <span class="mode-icon">✎</span>
+          <span class="mode-title">Free Write</span>
+          <span class="mode-hint">Write anything freely</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SCREEN: EXERCISE ── -->
+  <div id="screen-exercise" class="screen">
+
+    <!-- Header -->
+    <header class="app-header">
+      <button id="btn-back" class="btn-icon" title="Back to menu">←</button>
+      <div class="header-mode-label" id="header-mode-label">Letters</div>
+      <div class="header-stats">
+        <div class="stat-pill" id="stat-timer">00:00</div>
+        <div class="stat-pill accent" id="stat-score">0 pts</div>
+      </div>
+    </header>
+
+    <!-- Progress bar -->
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill"></div>
+      <span class="progress-label" id="progress-label">0 / 0</span>
+    </div>
+
+    <!-- Main exercise area -->
+    <main class="exercise-area">
+
+      <!-- Target display -->
+      <div class="target-block">
+        <div class="target-hangul" id="target-hangul">—</div>
+        <div class="target-hint" id="target-hint"></div>
+      </div>
+
+      <!-- Character-by-character feedback (words/sentences) -->
+      <div class="char-feedback" id="char-feedback" aria-live="polite"></div>
+
+      <!-- Input area -->
+      <div class="input-block">
+        <input
+          type="text"
+          id="exercise-input"
+          class="exercise-input"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+          spellcheck="false"
+          placeholder="Type in QWERTY — converts to 한글 automatically"
+        />
+        <div class="input-status" id="input-status"></div>
+      </div>
+
+      <!-- Controls -->
+      <div class="controls">
+        <button class="btn-secondary" id="btn-restart-exercise">↺ Restart</button>
+        <button class="btn-secondary" id="btn-skip">Skip →</button>
+        <button class="btn-kb" id="btn-toggle-keyboard" aria-pressed="true" title="Hide keyboard">⌨ Hide</button>
+        <button class="btn-primary" id="btn-next" disabled>Next →</button>
+      </div>
+
+    </main>
+
+    <!-- Virtual Keyboard -->
+    <div id="virtual-keyboard" class="virtual-keyboard" aria-label="Korean virtual keyboard"></div>
+
+    <!-- Metrics panel -->
+    <aside class="metrics-panel">
+      <div class="metric-item">
+        <span class="metric-label">Correct</span>
+        <span class="metric-value correct" id="m-correct">0</span>
+      </div>
+      <div class="metric-item">
+        <span class="metric-label">Errors</span>
+        <span class="metric-value error" id="m-errors">0</span>
+      </div>
+      <div class="metric-item">
+        <span class="metric-label">Accuracy</span>
+        <span class="metric-value" id="m-accuracy">—</span>
+      </div>
+      <div class="metric-item">
+        <span class="metric-label">Streak</span>
+        <span class="metric-value accent" id="m-streak">0</span>
+      </div>
+      <div class="metric-divider"></div>
+      <button class="btn-ghost" id="btn-restart-session">↺ New Session</button>
+    </aside>
+
+  </div>
+
+  <!-- ── SCREEN: RESULTS ── -->
+  <div id="screen-results" class="screen">
+    <div class="results-center">
+      <div class="results-trophy">✦</div>
+      <h2 class="results-title">Session Complete</h2>
+      <div class="results-grid">
+        <div class="result-stat">
+          <span class="result-val" id="r-correct">0</span>
+          <span class="result-lbl">Correct</span>
+        </div>
+        <div class="result-stat">
+          <span class="result-val" id="r-errors">0</span>
+          <span class="result-lbl">Errors</span>
+        </div>
+        <div class="result-stat">
+          <span class="result-val" id="r-accuracy">0%</span>
+          <span class="result-lbl">Accuracy</span>
+        </div>
+        <div class="result-stat">
+          <span class="result-val" id="r-score">0</span>
+          <span class="result-lbl">Points</span>
+        </div>
+        <div class="result-stat">
+          <span class="result-val" id="r-time">0:00</span>
+          <span class="result-lbl">Time</span>
+        </div>
+        <div class="result-stat">
+          <span class="result-val" id="r-streak">0</span>
+          <span class="result-lbl">Best Streak</span>
+        </div>
+      </div>
+      <div class="results-actions">
+        <button class="btn-primary" id="btn-play-again">Play Again</button>
+        <button class="btn-secondary" id="btn-menu">Main Menu</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ── SCREEN: FREE WRITE ── -->
+  <div id="screen-freewrite" class="screen">
+
+    <!-- Minimal header: back arrow only -->
+    <header class="fw-header">
+      <button id="fw-btn-back" class="btn-icon" title="Back to menu">←</button>
+      <button class="btn-kb fw-kb-toggle" id="fw-btn-toggle-kb" title="Toggle keyboard">⌨ Hide</button>
+    </header>
+
+    <!-- Textarea fills remaining space -->
+    <textarea
+      id="fw-textarea"
+      class="fw-textarea"
+      autocomplete="off"
+      autocorrect="off"
+      autocapitalize="off"
+      spellcheck="false"
+      placeholder="자유롭게 쓰세요… (Type in QWERTY — converts to 한글)"
+    ></textarea>
+
+    <!-- Target panel (collapsed by default) -->
+    <div class="fw-target-bar" id="fw-target-bar">
+      <button class="fw-target-toggle-btn" id="fw-btn-toggle-target">＋ Set target</button>
+      <div class="fw-target-input-wrap" id="fw-target-area" hidden>
+        <input
+          type="text"
+          id="fw-target-input"
+          class="fw-target-input"
+          autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+          placeholder="Type target in QWERTY, then press Enter…"
+        />
+        <button class="fw-target-clear-btn" id="fw-btn-clear-target" title="Clear">✕</button>
+      </div>
+      <div class="fw-char-feedback" id="fw-char-feedback" aria-live="polite"></div>
+      <div class="fw-match-status" id="fw-match-status"></div>
+    </div>
+
+    <!-- Virtual keyboard -->
+    <div id="fw-virtual-keyboard" class="virtual-keyboard" aria-label="Korean virtual keyboard"></div>
+
+    <!-- Hidden stat elements kept for JS compatibility -->
+    <span id="fw-stat-chars" hidden></span>
+    <span id="fw-stat-words" hidden></span>
+    <span id="fw-stat-hangul" hidden></span>
+    <span id="fw-stat-syllables" hidden></span>
+    <span id="fw-stat-jamo" hidden></span>
+    <span id="fw-density-bar" hidden></span>
+    <span id="fw-match-panel" hidden></span>
+    <span id="fw-match-bar" hidden></span>
+    <span id="fw-match-pct" hidden></span>
+    <span id="fw-target-display" hidden></span>
+    <span id="fw-target-text" hidden></span>
+
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

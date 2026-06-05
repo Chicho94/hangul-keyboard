@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Free Write — 한글 연습</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #0d0d0f;
+      --bg-2:        #14141a;
+      --surface:     #20202e;
+      --border:      #2e2e42;
+      --border-hi:   #4a4a6a;
+      --text-1:      #f0eeff;
+      --text-2:      #a8a4c8;
+      --text-3:      #6a6688;
+      --accent:      #c8b4ff;
+      --accent-dim:  #7a60cc;
+      --accent-glow: #c8b4ff44;
+      --correct:     #7effb2;
+      --correct-bg:  #7effb215;
+      --error:       #ff6b8a;
+      --error-bg:    #ff6b8a15;
+      --pending:     #3a3a52;
+      --font-mono:   'Space Mono', monospace;
+      --font-kr:     'Noto Sans KR', sans-serif;
+      --ease:        cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text-1);
+      font-family: var(--font-kr);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    button { cursor: pointer; font-family: inherit; border: none; background: none; }
+
+    /* ── Header ── */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-2);
+      flex-shrink: 0;
+    }
+
+    .btn-back {
+      color: var(--text-3);
+      font-size: 18px;
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 6px;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+    .btn-back:hover { background: var(--surface); color: var(--text-1); }
+
+    .btn-kb {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-3);
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      transition: all 0.2s;
+    }
+    .btn-kb:hover { border-color: var(--accent-dim); color: var(--accent); }
+
+    /* ── Textarea ── */
+    textarea {
+      flex: 1;
+      width: 100%;
+      background: var(--bg);
+      border: none;
+      padding: 28px 36px;
+      font-family: var(--font-kr);
+      font-size: 22px;
+      line-height: 1.9;
+      color: var(--text-1);
+      outline: none;
+      resize: none;
+      caret-color: var(--accent);
+      min-height: 0;
+    }
+    textarea::placeholder { color: var(--text-3); font-size: 15px; }
+
+    /* ── Target bar ── */
+    #target-bar {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 10px 16px;
+      border-top: 1px solid var(--border);
+      background: var(--bg-2);
+    }
+
+    .target-toggle-btn {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-3);
+      text-align: left;
+      padding: 2px 0;
+      transition: color 0.2s;
+    }
+    .target-toggle-btn:hover { color: var(--accent); }
+
+    .target-input-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    #target-input {
+      flex: 1;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-family: var(--font-kr);
+      font-size: 16px;
+      color: var(--text-1);
+      outline: none;
+      caret-color: var(--accent);
+      transition: border-color 0.2s;
+    }
+    #target-input:focus { border-color: var(--accent-dim); box-shadow: 0 0 0 2px var(--accent-glow); }
+    #target-input::placeholder { font-size: 12px; color: var(--text-3); font-family: var(--font-mono); }
+
+    .target-clear {
+      color: var(--text-3); font-size: 13px;
+      width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 6px;
+      transition: all 0.15s;
+    }
+    .target-clear:hover { color: var(--error); background: var(--error-bg); }
+
+    /* Char feedback tokens */
+    #char-feedback { display: flex; flex-wrap: wrap; gap: 3px; min-height: 0; }
+
+    .ch {
+      font-family: var(--font-kr);
+      font-size: 16px; font-weight: 700;
+      padding: 2px 4px;
+      border-radius: 4px;
+      border: 1px solid transparent;
+      line-height: 1;
+      transition: all 0.1s;
+    }
+    .ch.correct { color: var(--correct); background: var(--correct-bg); border-color: var(--correct); }
+    .ch.wrong   { color: var(--error);   background: var(--error-bg);   border-color: var(--error);   }
+    .ch.pending { color: var(--text-3);  background: var(--pending); }
+
+    #match-status {
+      font-family: var(--font-mono); font-size: 11px; height: 14px;
+    }
+    #match-status.ok  { color: var(--correct); }
+    #match-status.err { color: var(--error); }
+    #match-status.go  { color: var(--text-3); }
+
+    /* ── Virtual keyboard ── */
+    #keyboard {
+      flex-shrink: 0;
+      background: var(--bg-2);
+      border-top: 1px solid var(--border);
+      padding: 10px 12px 8px;
+      overflow: hidden;
+      max-height: 260px;
+      transition: max-height 0.3s var(--ease), opacity 0.25s, padding 0.3s;
+    }
+    #keyboard.hidden {
+      max-height: 0; opacity: 0; padding-top: 0; padding-bottom: 0;
+      pointer-events: none; border-top-color: transparent;
+    }
+
+    .vk-row { display: flex; gap: 4px; justify-content: center; margin-bottom: 4px; }
+    .vk-row:last-child { margin-bottom: 0; }
+
+    .k {
+      position: relative;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      min-width: 44px; height: 48px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      user-select: none;
+      transition: background 0.08s, border-color 0.08s, transform 0.08s, box-shadow 0.08s;
+      padding: 2px 4px; gap: 1px;
+    }
+    .k.inactive { background: var(--bg-3, #1c1c26); border-color: var(--bg-3, #1c1c26); }
+    .k.active {
+      background: var(--accent-glow);
+      border-color: var(--accent);
+      box-shadow: 0 0 10px var(--accent-glow);
+      transform: translateY(1px) scale(0.96);
+    }
+    .k .kr       { font-family: var(--font-kr); font-size: 14px; font-weight: 700; color: var(--accent); line-height: 1; }
+    .k .kr-shift { position: absolute; top: 3px; right: 5px; font-family: var(--font-kr); font-size: 9px; font-weight: 700; color: var(--accent-dim); }
+    .k .qw       { font-family: var(--font-mono); font-size: 9px; color: var(--text-3); line-height: 1; }
+    .k.inactive .qw { font-size: 10px; }
+
+    .k.w-backspace { min-width: 72px; }
+    .k.w-tab       { min-width: 64px; }
+    .k.w-caps      { min-width: 72px; }
+    .k.w-enter     { min-width: 80px; }
+    .k.w-shiftl    { min-width: 88px; }
+    .k.w-shiftr    { min-width: 88px; }
+    .k.w-space     { min-width: 320px; height: 38px; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="index.html" class="btn-back" title="Back to menu">←</a>
+    <button id="btn-toggle-kb" class="btn-kb">⌨ Hide</button>
+  </header>
+
+  <textarea id="main-ta" placeholder="자유롭게 쓰세요… (Type in QWERTY — converts to 한글)" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+
+  <div id="target-bar">
+    <button class="target-toggle-btn" id="btn-toggle-target">＋ Set target</button>
+    <div class="target-input-wrap" id="target-wrap" hidden>
+      <input id="target-input" type="text" placeholder="Type target in QWERTY, press Enter…" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off" />
+      <button class="target-clear" id="btn-clear-target">✕</button>
+    </div>
+    <div id="char-feedback"></div>
+    <div id="match-status"></div>
+  </div>
+
+  <div id="keyboard"></div>
+
+<script type="module">
+// ─────────────────────────────────────────────
+// Inline all needed logic — no cross-file imports
+// ─────────────────────────────────────────────
+
+// ── 2-beolsik IME (copy of hangul.js core) ───
+const KEY_MAP = {
+  r:{cho:0,jong:1},R:{cho:1,jong:2},s:{cho:2,jong:4},e:{cho:3,jong:7},
+  E:{cho:4,jong:0},f:{cho:5,jong:8},a:{cho:6,jong:16},q:{cho:7,jong:17},
+  Q:{cho:8,jong:0},t:{cho:9,jong:19},T:{cho:10,jong:20},d:{cho:11,jong:21},
+  w:{cho:12,jong:22},W:{cho:13,jong:0},c:{cho:14,jong:23},z:{cho:15,jong:24},
+  x:{cho:16,jong:25},v:{cho:17,jong:26},g:{cho:18,jong:27},
+  k:{jung:0},o:{jung:1},i:{jung:2},O:{jung:3},j:{jung:4},p:{jung:5},
+  u:{jung:6},P:{jung:7},h:{jung:8},y:{jung:12},n:{jung:13},
+  b:{jung:17},m:{jung:18},l:{jung:20},
+};
+const CJ={'8+0':9,'8+1':10,'8+20':11,'13+4':14,'13+5':15,'13+20':16,'18+20':19};
+const CJONG={'1+19':3,'4+22':5,'4+27':6,'8+1':9,'8+16':10,'8+17':11,'8+19':12,'8+20':13,'8+26':14,'8+27':15,'17+19':18};
+const SJ={3:[1,9],5:[4,12],6:[4,18],9:[8,0],10:[8,6],11:[8,7],12:[8,9],13:[8,10],14:[8,17],15:[8,18],18:[17,9]};
+const J2C={1:0,2:1,4:2,7:3,8:5,16:6,17:7,19:9,20:10,21:11,22:12,23:14,24:15,25:16,26:17,27:18};
+const CHO=['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+const build=(c,j,jj)=>String.fromCodePoint(0xAC00+(c*21+j)*28+jj);
+const empty=()=>({cho:null,jung:null,jong:null});
+
+function onV(ji,s){
+  if(s.cho===null)return{e:'',s:{cho:11,jung:ji,jong:null}};
+  if(s.jung===null)return{e:'',s:{cho:s.cho,jung:ji,jong:null}};
+  if(s.jong===null){const k=`${s.jung}+${ji}`;if(CJ[k]!==undefined)return{e:'',s:{cho:s.cho,jung:CJ[k],jong:null}};return{e:build(s.cho,s.jung,0),s:{cho:11,jung:ji,jong:null}};}
+  let pj=0,nc;if(SJ[s.jong])[pj,nc]=SJ[s.jong];else nc=J2C[s.jong]??s.jong;
+  return{e:build(s.cho,s.jung,pj),s:{cho:nc,jung:ji,jong:null}};
+}
+function onC(en,s){
+  const{cho:ci,jong:ji}=en;
+  if(s.cho===null)return{e:'',s:{cho:ci,jung:null,jong:null}};
+  if(s.jung===null)return{e:CHO[s.cho],s:{cho:ci,jung:null,jong:null}};
+  if(s.jong===null){if(ji>0)return{e:'',s:{cho:s.cho,jung:s.jung,jong:ji}};return{e:build(s.cho,s.jung,0),s:{cho:ci,jung:null,jong:null}};}
+  const k=`${s.jong}+${ji}`;if(ji>0&&CJONG[k]!==undefined)return{e:'',s:{cho:s.cho,jung:s.jung,jong:CJONG[k]}};
+  return{e:build(s.cho,s.jung,s.jong),s:{cho:ci,jung:null,jong:null}};
+}
+function fl(s){if(s.cho===null)return'';if(s.jung===null)return CHO[s.cho]??'';return build(s.cho,s.jung,s.jong??0);}
+
+function convert(raw){
+  let r='',s=empty();
+  for(const k of raw){
+    if(k===' '){r+=fl(s)+' ';s=empty();continue;}
+    if(k==='\n'){r+=fl(s)+'\n';s=empty();continue;}
+    const en=KEY_MAP[k];
+    if(!en){r+=fl(s)+k;s=empty();continue;}
+    let o;if('jung' in en)o=onV(en.jung,s);else o=onC(en,s);
+    r+=o.e;s=o.s;
+  }
+  return r+fl(s);
+}
+
+// ── Validator (char-by-char) ──────────────────
+function validate(input, target) {
+  if (!input) return { results: [], errors: [], complete: false, status: 'idle' };
+  const max = Math.max(input.length, target.length);
+  const results = [];
+  const errors = [];
+  for (let i = 0; i < max; i++) {
+    const exp = target[i], rec = input[i];
+    let status;
+    if (rec === undefined)      status = 'pending';
+    else if (exp === undefined) { status = 'extra'; errors.push(i); }
+    else if (rec === exp)       status = 'correct';
+    else                        { status = 'wrong'; errors.push(i); }
+    results.push({ i, status });
+  }
+  const pending  = results.some(r => r.status === 'pending');
+  const complete = !errors.length && !pending && input.length === target.length;
+  const status   = complete ? 'complete' : errors.length ? 'error' : input.length ? 'partial' : 'idle';
+  return { results, errors, complete, status };
+}
+
+// ── Virtual keyboard layout ───────────────────
+const ROWS = [
+  [{q:'`'},{q:'1'},{q:'2'},{q:'3'},{q:'4'},{q:'5'},{q:'6'},{q:'7'},{q:'8'},{q:'9'},{q:'0'},{q:'-'},{q:'='},{q:'Backspace',l:'⌫',w:'backspace'}],
+  [{q:'Tab',l:'Tab',w:'tab'},{q:'q',kr:'ㅂ',sh:'ㅃ'},{q:'w',kr:'ㅈ',sh:'ㅉ'},{q:'e',kr:'ㄷ',sh:'ㄸ'},{q:'r',kr:'ㄱ',sh:'ㄲ'},{q:'t',kr:'ㅅ',sh:'ㅆ'},{q:'y',kr:'ㅛ'},{q:'u',kr:'ㅕ'},{q:'i',kr:'ㅑ'},{q:'o',kr:'ㅐ',sh:'ㅒ'},{q:'p',kr:'ㅔ',sh:'ㅖ'},{q:'['},{q:']'},{q:'\\',w:'backslash'}],
+  [{q:'CapsLock',l:'Caps',w:'caps'},{q:'a',kr:'ㅁ'},{q:'s',kr:'ㄴ'},{q:'d',kr:'ㅇ'},{q:'f',kr:'ㄹ'},{q:'g',kr:'ㅎ'},{q:'h',kr:'ㅗ'},{q:'j',kr:'ㅓ'},{q:'k',kr:'ㅏ'},{q:'l',kr:'ㅣ'},{q:';'},{q:"'"},{q:'Enter',l:'↵',w:'enter'}],
+  [{q:'Shift',l:'⇧',w:'shiftl'},{q:'z',kr:'ㅋ'},{q:'x',kr:'ㅌ'},{q:'c',kr:'ㅊ'},{q:'v',kr:'ㅍ'},{q:'b',kr:'ㅠ'},{q:'n',kr:'ㅜ'},{q:'m',kr:'ㅡ'},{q:','},{q:'.'},{q:'/'},{q:'Shift',l:'⇧',w:'shiftr'}],
+  [{q:' ',l:'Space',w:'space'}],
+];
+
+// Build keyboard DOM
+const kbEl = document.getElementById('keyboard');
+const keyEls = new Map();
+
+ROWS.forEach((row, ri) => {
+  const rowEl = document.createElement('div');
+  rowEl.className = 'vk-row';
+  row.forEach(def => {
+    const el = document.createElement('div');
+    el.className = 'k' + (def.kr ? '' : ' inactive') + (def.w ? ` w-${def.w}` : '');
+    if (def.kr) {
+      const s = document.createElement('span'); s.className = 'kr'; s.textContent = def.kr; el.appendChild(s);
+      if (def.sh) { const ss = document.createElement('span'); ss.className = 'kr-shift'; ss.textContent = def.sh; el.appendChild(ss); }
+    }
+    const q = document.createElement('span'); q.className = 'qw'; q.textContent = def.l ?? def.q; el.appendChild(q);
+    rowEl.appendChild(el);
+    const lk = def.q.toLowerCase();
+    if (!keyEls.has(lk)) keyEls.set(lk, []);
+    keyEls.get(lk).push(el);
+  });
+  kbEl.appendChild(rowEl);
+});
+
+// Prevent keyboard clicks from stealing focus
+kbEl.addEventListener('mousedown', e => e.preventDefault());
+
+function highlightKey(key) {
+  const lk = key === ' ' ? 'space' : key.toLowerCase();
+  const els = keyEls.get(lk) ?? [];
+  els.forEach(el => el.classList.add('active'));
+  if (key !== key.toLowerCase() && key.length === 1) {
+    (keyEls.get('shift') ?? []).forEach(el => el.classList.add('active'));
+  }
+  setTimeout(() => {
+    keyEls.forEach(list => list.forEach(el => el.classList.remove('active')));
+  }, 180);
+}
+
+// ── State ─────────────────────────────────────
+let writeRaw  = '';
+let targetRaw = '';
+let targetVal = '';
+let targetFocused = false;
+
+const ta        = document.getElementById('main-ta');
+const targetIn  = document.getElementById('target-input');
+const charFb    = document.getElementById('char-feedback');
+const matchSt   = document.getElementById('match-status');
+const targetWrap= document.getElementById('target-wrap');
+const btnToggleTgt = document.getElementById('btn-toggle-target');
+
+// ── Main textarea IME ─────────────────────────
+ta.focus();
+
+ta.addEventListener('focus', () => { targetFocused = false; });
+
+ta.addEventListener('keydown', e => {
+  if (targetFocused) return;
+  if (e.ctrlKey || e.altKey || e.metaKey) return;
+
+  if (e.key === 'Backspace') {
+    e.preventDefault(); highlightKey('Backspace');
+    writeRaw = writeRaw.slice(0, -1);
+  } else if (e.key === 'Enter') {
+    e.preventDefault(); highlightKey('Enter');
+    writeRaw += '\n';
+  } else if (e.key === ' ') {
+    e.preventDefault(); highlightKey(' ');
+    writeRaw += ' ';
+  } else if (e.key.length === 1) {
+    e.preventDefault(); highlightKey(e.key);
+    writeRaw += e.key;
+  } else return;
+
+  const val = convert(writeRaw);
+  ta.value = val;
+  ta.selectionStart = ta.selectionEnd = val.length;
+  if (targetVal) updateFeedback(val, targetVal);
+});
+
+// ── Target input IME ──────────────────────────
+targetIn.addEventListener('focus', () => { targetFocused = true; });
+targetIn.addEventListener('blur',  () => { targetFocused = false; });
+
+targetIn.addEventListener('keydown', e => {
+  if (e.ctrlKey || e.altKey || e.metaKey) return;
+
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    targetVal = convert(targetRaw);
+    updateFeedback(convert(writeRaw), targetVal);
+    ta.focus();
+    return;
+  }
+  if (e.key === 'Escape') { e.preventDefault(); ta.focus(); return; }
+
+  if (e.key === 'Backspace') {
+    e.preventDefault(); highlightKey('Backspace');
+    targetRaw = targetRaw.slice(0, -1);
+  } else if (e.key === ' ') {
+    e.preventDefault(); highlightKey(' ');
+    targetRaw += ' ';
+  } else if (e.key.length === 1) {
+    e.preventDefault(); highlightKey(e.key);
+    targetRaw += e.key;
+  } else return;
+
+  const val = convert(targetRaw);
+  targetIn.value = val;
+  targetVal = val;
+  updateFeedback(convert(writeRaw), val);
+});
+
+// ── Feedback rendering ────────────────────────
+function updateFeedback(written, target) {
+  if (!target) { charFb.innerHTML = ''; matchSt.textContent = ''; return; }
+  const v = validate(written, target);
+  charFb.innerHTML = [...target].map((ch, i) => {
+    const st = v.results[i]?.status ?? 'pending';
+    return `<span class="ch ${st}">${ch === ' ' ? '␣' : ch}</span>`;
+  }).join('');
+  if (v.complete) {
+    matchSt.textContent = '✓ Perfect match!'; matchSt.className = 'ok';
+  } else if (v.status === 'error') {
+    matchSt.textContent = `${v.errors.length} error${v.errors.length !== 1 ? 's' : ''}`; matchSt.className = 'err';
+  } else if (v.status === 'partial') {
+    matchSt.textContent = 'Keep going…'; matchSt.className = 'go';
+  } else {
+    matchSt.textContent = ''; matchSt.className = '';
+  }
+}
+
+// ── Buttons ───────────────────────────────────
+document.getElementById('btn-toggle-kb').addEventListener('click', () => {
+  const kb = document.getElementById('keyboard');
+  const btn = document.getElementById('btn-toggle-kb');
+  const hidden = kb.classList.toggle('hidden');
+  btn.textContent = hidden ? '⌨ Show' : '⌨ Hide';
+});
+
+btnToggleTgt.addEventListener('click', () => {
+  const open = !targetWrap.hidden;
+  if (open) {
+    targetWrap.hidden = true;
+    btnToggleTgt.textContent = '＋ Set target';
+    targetRaw = ''; targetVal = '';
+    targetIn.value = '';
+    charFb.innerHTML = ''; matchSt.textContent = '';
+  } else {
+    targetWrap.hidden = false;
+    btnToggleTgt.textContent = '− Remove target';
+    requestAnimationFrame(() => targetIn.focus());
+  }
+});
+
+document.getElementById('btn-clear-target').addEventListener('click', () => {
+  targetRaw = ''; targetVal = '';
+  targetIn.value = '';
+  charFb.innerHTML = ''; matchSt.textContent = '';
+  targetIn.focus();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "name": "hangul-practice",
+  "version": "1.0.0",
+  "description": "Hangul writing practice app",
+  "scripts": {
+    "start": "npx serve . --listen 3000 --no-clipboard",
+    "dev":   "npx serve . --listen 3000"
+  },
+  "license": "MIT"
+}
